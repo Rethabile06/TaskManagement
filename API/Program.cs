@@ -6,6 +6,7 @@ using Core.Services;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,7 +21,7 @@ builder.Services.AddDbContext<TaskDbContext>(opt =>
 
 builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<ITeamMemberService, TeamMemberService>();
-builder.Services.AddScoped<ITaskRepository, ITaskRepository>();
+builder.Services.AddScoped<ITaskRepository, TaskRepository>();
 builder.Services.AddScoped<ITeamMemberRepository, TeamMemberRepository>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
@@ -31,6 +32,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference();
 }
 
 app.UseHttpsRedirection();
