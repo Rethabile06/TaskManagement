@@ -1,0 +1,127 @@
+﻿using AutoMapper;
+using Core.Entities;
+using Core.Interfaces.IRepositories;
+using Core.Models;
+using Core.Services;
+using Microsoft.Extensions.Logging;
+using Moq;
+
+namespace Tests.Unit
+{
+    public class TeamMemberServiceTests
+    {
+        private readonly Mock<ITeamMemberRepository> _memberRepository;
+        private readonly Mock<IMapper> _mapper;
+        private readonly Mock<ILogger<TeamMemberService>> _logger;
+
+        private readonly TeamMemberService _memberService;
+
+        public TeamMemberServiceTests()
+        {
+            _memberRepository = new Mock<ITeamMemberRepository>();
+            _mapper = new Mock<IMapper>();
+            _logger = new Mock<ILogger<TeamMemberService>>();
+
+            _memberService = new TeamMemberService(_memberRepository.Object, _mapper.Object, _logger.Object);
+        }
+
+        [Fact]
+        public async Task CreateMemberAsync_ShouldReturnSuccess_WhenDataIsValid()
+        {
+            // Arrange
+            var dto = new TeamMemberDto { Name = "Tyrion", Surname = "Lannister" };
+            var entity = new TeamMember { Name = "Tyrion", Surname = "Lannister" };
+
+            _mapper.Setup(m => m.Map<TeamMember>(dto))
+                .Returns(entity);
+
+            _mapper.Setup(m => m.Map<TeamMemberDto>(entity))
+                .Returns(dto);
+
+            // Act
+            var result = await _memberService.CreateMemberAsync(dto);
+
+            // Assert
+            Assert.True(result.IsSuccess);
+            Assert.NotNull(result.Data);
+
+            _memberRepository.Verify(x => x.AddAsync(It.IsAny<TeamMember>()), Times.Once);
+            _memberRepository.Verify(x => x.SaveChangesAsync(), Times.Once);
+        }
+
+        [Theory]
+        [InlineData("", "Snow")]
+        [InlineData("Jon", "")]
+        [InlineData(null, null)]
+        public async Task CreateMemberAsync_ShouldReturnFailure_WhenNameOrSurnameIsMissing(string name, string surname)
+        {
+            // Arrange
+            var dto = new TeamMemberDto { Name = name, Surname = surname };
+
+            // Act
+            var result = await _memberService.CreateMemberAsync(dto);
+
+            // Assert
+            Assert.False(result.IsSuccess);
+            Assert.Equal("Member name and surname is required", result.Error);
+        }
+
+        [Fact]
+        public async Task GetMemberByIdAsync_ShouldReturnFailure_WhenMemberNotFound()
+        {
+            // Arrange
+            _memberRepository.Setup(x => x.GetByIdAsync(It.IsAny<Guid>()))
+                .ReturnsAsync((TeamMember?)null);
+
+            // Act
+            var result = await _memberService.GetMemberByIdAsync(Guid.NewGuid());
+
+            // Assert
+            Assert.False(result.IsSuccess);
+            Assert.Equal("Team member not found", result.Error);
+        }
+
+        [Fact]
+        public async Task UpdateMemberAsync_ShouldSetUpdatedAt_AndCallRepository()
+        {
+            // Arrange
+            var memberId = Guid.NewGuid();
+            var existingMember = new TeamMember { Id = memberId, Name = "Old", Surname = "Name" };
+            var updateDto = new TeamMemberDto { Name = "New", Surname = "Name" };
+
+            _memberRepository.Setup(x => x.GetByIdAsync(memberId))
+                .ReturnsAsync(existingMember);
+
+            // Act
+            var result = await _memberService.UpdateMemberAsync(memberId, updateDto);
+
+            // Assert
+            Assert.True(result.IsSuccess);
+            Assert.Equal(DateTime.UtcNow, existingMember.UpdatedAt, TimeSpan.FromSeconds(1));
+
+            _mapper.Verify(m => m.Map(updateDto, existingMember), Times.Once);
+            _memberRepository.Verify(x => x.Update(existingMember), Times.Once);
+            _memberRepository.Verify(x => x.SaveChangesAsync(), Times.Once);
+        }
+
+        [Fact]
+        public async Task DeleteMemberAsync_ShouldReturnSuccess_WhenMemberExists()
+        {
+            // Arrange
+            var memberId = Guid.NewGuid();
+            var existingMember = new TeamMember { Id = memberId, Name = "Arya", Surname = "Stark" };
+
+            _memberRepository.Setup(x => x.GetByIdAsync(memberId))
+                .ReturnsAsync(existingMember);
+
+            // Act
+            var result = await _memberService.DeleteMemberAsync(memberId);
+
+            // Assert
+            Assert.True(result.IsSuccess);
+
+            _memberRepository.Verify(x => x.Delete(existingMember), Times.Once);
+            _memberRepository.Verify(x => x.SaveChangesAsync(), Times.Once);
+        }
+    }
+}

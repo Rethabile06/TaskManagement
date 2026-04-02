@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="API/API.csproj" />
+  <Project Path="Core/Core.csproj" />
+  <Project Path="Infrastructure/Infrastructure.csproj" />
+  <Project Path="Tests.Unit/Tests.Unit.csproj" Id="0a338b99-98d9-4512-a318-f34bbd2a70e4" />
+</Solution>
