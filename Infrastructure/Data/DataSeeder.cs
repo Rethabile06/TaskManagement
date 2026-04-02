@@ -56,8 +56,7 @@ namespace Infrastructure.Data
                         Description = "Investigate Backend Services.",
                         Priority = TaskPriority.Medium,
                         Status = TaskStatus.Todo,
-                        CreatedAt = DateTime.UtcNow,
-                        UpdatedAt = DateTime.UtcNow
+                        CreatedAt = DateTime.UtcNow
                     },
                     new()
                     {
@@ -67,8 +66,7 @@ namespace Infrastructure.Data
                         Priority = TaskPriority.Low,
                         Status = TaskStatus.Todo,
                         AssigneeId = users.FirstOrDefault()?.Id,
-                        CreatedAt = DateTime.UtcNow,
-                        UpdatedAt = DateTime.UtcNow
+                        CreatedAt = DateTime.UtcNow
                     },
                     new()
                     {
@@ -78,8 +76,7 @@ namespace Infrastructure.Data
                         Priority = TaskPriority.High,
                         Status = TaskStatus.InProgress,
                         AssigneeId = users.LastOrDefault()?.Id,
-                        CreatedAt = DateTime.UtcNow,
-                        UpdatedAt = DateTime.UtcNow
+                        CreatedAt = DateTime.UtcNow
                     }
                 };
 

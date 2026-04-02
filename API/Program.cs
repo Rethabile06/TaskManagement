@@ -24,7 +24,8 @@ builder.Services.AddScoped<ITeamMemberService, TeamMemberService>();
 builder.Services.AddScoped<ITaskRepository, TaskRepository>();
 builder.Services.AddScoped<ITeamMemberRepository, TeamMemberRepository>();
 
-builder.Services.AddAutoMapper(typeof(MappingProfile));
+builder.Services.AddAutoMapper(cfg =>
+{ }, typeof(MappingProfile).Assembly);
 
 var app = builder.Build();
 

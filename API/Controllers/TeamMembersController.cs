@@ -6,7 +6,7 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TeamMemberController(ITeamMemberService memberService) : ControllerBase
+    public class TeamMembersController(ITeamMemberService memberService) : ControllerBase
     {
         [HttpGet]
         public async Task<IActionResult> GetAllMembers()
