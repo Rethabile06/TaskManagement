@@ -1,8 +1,6 @@
-﻿using Core.Enums;
-using Core.Interfaces.IServices;
-using Core.Models;
+﻿using Core.Interfaces.IServices;
+using Core.Models.Task;
 using Microsoft.AspNetCore.Mvc;
-using TaskStatus = Core.Enums.TaskStatus;
 
 namespace API.Controllers
 {
@@ -29,9 +27,9 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateTask(TaskDto taskDto)
+        public async Task<IActionResult> CreateTask(CreateTaskRequest request)
         {
-            var result = await taskService.CreateTaskAsync(taskDto);
+            var result = await taskService.CreateTaskAsync(request);
 
             if (!result.IsSuccess)
                 return BadRequest(result.Error);
@@ -51,9 +49,9 @@ namespace API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateTask(Guid id, TaskDto dto)
+        public async Task<IActionResult> UpdateTask(Guid id, UpdateTaskRequest request)
         {
-            var result = await taskService.UpdateTaskAsync(id, dto);
+            var result = await taskService.UpdateTaskAsync(id, request);
 
             if (!result.IsSuccess)
                 return BadRequest(result.Error);
@@ -61,33 +59,10 @@ namespace API.Controllers
             return NoContent();
         }
 
-        [HttpPut("{id}/assign/{assigneeId}")]
-        //public async Task<IActionResult> AssignTask(Guid id, [FromBody] Guid assigneeId)
-        public async Task<IActionResult> AssignTask(Guid id, Guid assigneeId)
+        [HttpPut("{id}/assign/{memberId}")]
+        public async Task<IActionResult> AssignTask(Guid id, Guid memberId)
         {
-            var result = await taskService.AssignTaskAsync(id, assigneeId);
-
-            if (!result.IsSuccess)
-                return BadRequest(result.Error);
-
-            return NoContent();
-        }
-
-        [HttpPut("{id}/priority")]
-        public async Task<IActionResult> UpdateTaskPriority(Guid id, [FromBody] TaskPriority priority)
-        {
-            var result = await taskService.UpdateTaskPriorityAsync(id, priority);
-
-            if (!result.IsSuccess)
-                return BadRequest(result.Error);
-
-            return NoContent();
-        }
-
-        [HttpPut("{id}/status")]
-        public async Task<IActionResult> UpdateTaskStatus(Guid id, [FromBody] TaskStatus status)
-        {
-            var result = await taskService.UpdateTaskStatusAsync(id, status);
+            var result = await taskService.AssignTaskAsync(id, memberId);
 
             if (!result.IsSuccess)
                 return BadRequest(result.Error);

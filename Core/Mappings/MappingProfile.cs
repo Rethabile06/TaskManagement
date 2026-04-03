@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Core.Entities;
-using Core.Models;
+using Core.Models.Task;
+using Core.Models.TeamMember;
 
 namespace Core.Mappings
 {
@@ -9,25 +10,28 @@ namespace Core.Mappings
         public MappingProfile()
         {
             // Entity to DTO
-            CreateMap<TaskItem, TaskDto>()
-                .ForMember(dest => dest.AssigneeName,
-                           opt => opt.MapFrom(src => src.Assignee != null ? src.Assignee.Name : null));
+            CreateMap<TaskItem, TaskResponse>()
+                .ForMember(dest => dest.MemberName,
+                           opt => opt.MapFrom(src => src.Member != null ? $"{src.Member.Name} {src.Member.Surname}".Trim() : null));
 
-            CreateMap<TeamMember, TeamMemberDto>();
-            
+            CreateMap<TeamMember, TeamMemberResponse>();
+
             // DTO to Entity
-            CreateMap<TaskDto, TaskItem>()
+            CreateMap<CreateTaskRequest, TaskItem>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
                 .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
-                .ForMember(dest => dest.Assignee, opt => opt.Ignore())
+                .ForMember(dest => dest.MemberId, opt => opt.Ignore())
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
 
-            CreateMap<TeamMemberDto, TeamMember>()
+            CreateMap<UpdateTaskRequest, TaskItem>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
                 .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
-                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) =>
+                               srcMember != null && (!(srcMember is string s) || !string.IsNullOrWhiteSpace(s))));
+
+            CreateMap<TeamMemberRequest, TeamMember>();
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Core.Entities;
 using Core.Interfaces.IRepositories;
-using Core.Models;
+using Core.Models.TeamMember;
 using Core.Services;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -29,17 +29,18 @@ namespace Tests.Unit
         public async Task CreateMemberAsync_ShouldReturnSuccess_WhenDataIsValid()
         {
             // Arrange
-            var dto = new TeamMemberDto { Name = "Tyrion", Surname = "Lannister" };
-            var entity = new TeamMember { Name = "Tyrion", Surname = "Lannister" };
+            var request = new TeamMemberRequest { Name = "Tyrion", Surname = "Lannister" };
+            var response = new TeamMemberResponse { Name = "Tyrion", Surname = "Lannister" };
+            var memberEntity = new TeamMember { Name = "Tyrion", Surname = "Lannister" };
 
-            _mapper.Setup(m => m.Map<TeamMember>(dto))
-                .Returns(entity);
+            _mapper.Setup(m => m.Map<TeamMember>(request))
+                .Returns(memberEntity);
 
-            _mapper.Setup(m => m.Map<TeamMemberDto>(entity))
-                .Returns(dto);
+            _mapper.Setup(m => m.Map<TeamMemberResponse>(memberEntity))
+                .Returns(response);
 
             // Act
-            var result = await _memberService.CreateMemberAsync(dto);
+            var result = await _memberService.CreateMemberAsync(request);
 
             // Assert
             Assert.True(result.IsSuccess);
@@ -56,10 +57,10 @@ namespace Tests.Unit
         public async Task CreateMemberAsync_ShouldReturnFailure_WhenNameOrSurnameIsMissing(string name, string surname)
         {
             // Arrange
-            var dto = new TeamMemberDto { Name = name, Surname = surname };
+            var request = new TeamMemberRequest { Name = name, Surname = surname };
 
             // Act
-            var result = await _memberService.CreateMemberAsync(dto);
+            var result = await _memberService.CreateMemberAsync(request);
 
             // Assert
             Assert.False(result.IsSuccess);
@@ -86,21 +87,21 @@ namespace Tests.Unit
         {
             // Arrange
             var memberId = Guid.NewGuid();
-            var existingMember = new TeamMember { Id = memberId, Name = "Old", Surname = "Name" };
-            var updateDto = new TeamMemberDto { Name = "New", Surname = "Name" };
+            var member = new TeamMember { Id = memberId, Name = "Old", Surname = "Name" };
+            var request = new TeamMemberRequest { Name = "New", Surname = "Name" };
 
             _memberRepository.Setup(x => x.GetByIdAsync(memberId))
-                .ReturnsAsync(existingMember);
+                .ReturnsAsync(member);
 
             // Act
-            var result = await _memberService.UpdateMemberAsync(memberId, updateDto);
+            var result = await _memberService.UpdateMemberAsync(memberId, request);
 
             // Assert
             Assert.True(result.IsSuccess);
-            Assert.Equal(DateTime.UtcNow, existingMember.UpdatedAt, TimeSpan.FromSeconds(1));
+            Assert.Equal(DateTime.UtcNow, member.UpdatedAt, TimeSpan.FromSeconds(1));
 
-            _mapper.Verify(m => m.Map(updateDto, existingMember), Times.Once);
-            _memberRepository.Verify(x => x.Update(existingMember), Times.Once);
+            _mapper.Verify(m => m.Map(request, member), Times.Once);
+            _memberRepository.Verify(x => x.Update(member), Times.Once);
             _memberRepository.Verify(x => x.SaveChangesAsync(), Times.Once);
         }
 
@@ -109,10 +110,10 @@ namespace Tests.Unit
         {
             // Arrange
             var memberId = Guid.NewGuid();
-            var existingMember = new TeamMember { Id = memberId, Name = "Arya", Surname = "Stark" };
+            var member = new TeamMember { Id = memberId, Name = "Arya", Surname = "Stark" };
 
             _memberRepository.Setup(x => x.GetByIdAsync(memberId))
-                .ReturnsAsync(existingMember);
+                .ReturnsAsync(member);
 
             // Act
             var result = await _memberService.DeleteMemberAsync(memberId);
@@ -120,7 +121,7 @@ namespace Tests.Unit
             // Assert
             Assert.True(result.IsSuccess);
 
-            _memberRepository.Verify(x => x.Delete(existingMember), Times.Once);
+            _memberRepository.Verify(x => x.Delete(member), Times.Once);
             _memberRepository.Verify(x => x.SaveChangesAsync(), Times.Once);
         }
     }

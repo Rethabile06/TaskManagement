@@ -7,13 +7,13 @@ namespace Core.Entities
     {
         public required string Title { get; set; }
         public string? Description { get; set; }
-        public TaskStatus Status { get; set; }
-        public TaskPriority Priority { get; set; }
+        public TaskStatus? Status { get; set; }
+        public TaskPriority? Priority { get; set; }
 
         // Foreign Key
-        public Guid? AssigneeId { get; set; } 
+        public Guid? MemberId { get; set; } 
 
         // Navigation Property
-        public TeamMember? Assignee { get; set; }
+        public TeamMember? Member { get; set; }
     }
 }

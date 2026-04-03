@@ -65,7 +65,7 @@ namespace Infrastructure.Data
                         Description = "Onboard New Team Memebers.",
                         Priority = TaskPriority.Low,
                         Status = TaskStatus.Todo,
-                        AssigneeId = users.FirstOrDefault()?.Id,
+                        MemberId = users.FirstOrDefault()?.Id,
                         CreatedAt = DateTime.UtcNow
                     },
                     new()
@@ -75,7 +75,7 @@ namespace Infrastructure.Data
                         Description = "Implement Clean Architecture.",
                         Priority = TaskPriority.High,
                         Status = TaskStatus.InProgress,
-                        AssigneeId = users.LastOrDefault()?.Id,
+                        MemberId = users.LastOrDefault()?.Id,
                         CreatedAt = DateTime.UtcNow
                     }
                 };

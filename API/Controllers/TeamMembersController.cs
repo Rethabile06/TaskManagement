@@ -1,5 +1,5 @@
 ﻿using Core.Interfaces.IServices;
-using Core.Models;
+using Core.Models.TeamMember;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -27,9 +27,9 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateMember(TeamMemberDto memberDto)
+        public async Task<IActionResult> CreateMember(TeamMemberRequest request)
         {
-            var result = await memberService.CreateMemberAsync(memberDto);
+            var result = await memberService.CreateMemberAsync(request);
 
             if (!result.IsSuccess)
                 return BadRequest(result.Error);
@@ -38,9 +38,9 @@ namespace API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateMember(Guid id, TeamMemberDto memberDto)
+        public async Task<IActionResult> UpdateMember(Guid id, TeamMemberRequest request)
         {
-            var result = await memberService.UpdateMemberAsync(id, memberDto);
+            var result = await memberService.UpdateMemberAsync(id, request);
 
             if (!result.IsSuccess)
                 return BadRequest(result.Error);

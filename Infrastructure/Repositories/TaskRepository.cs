@@ -1,9 +1,9 @@
 ﻿using Core.Entities;
+using Core.Enums;
 using Core.Interfaces.IRepositories;
-using Core.Models;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using TaskStatus = Core.Enums.TaskStatus;
 
 namespace Infrastructure.Repositories
 {
@@ -21,24 +21,24 @@ namespace Infrastructure.Repositories
 
         public async Task<TaskItem?> GetByIdAsync(Guid id)
         {
-            return await context.Tasks.Include(t => t.Assignee).FirstOrDefaultAsync(t => t.Id == id);
+            return await context.Tasks.Include(t => t.Member).FirstOrDefaultAsync(t => t.Id == id);
         }
 
-        public async Task<IEnumerable<TaskItem>> GetAllAsync(TaskQuery query)
+        public async Task<IEnumerable<TaskItem>> GetAllAsync(TaskStatus? status, TaskPriority? priority, Guid? memberId, string? searchTerm)
         {
-            var taskQuery = context.Tasks.Include(t => t.Assignee).AsQueryable();
+            var taskQuery = context.Tasks.Include(t => t.Member).AsQueryable();
 
-            if (query.Status.HasValue)
-                taskQuery = taskQuery.Where(s => s.Status == query.Status);
+            if (status.HasValue)
+                taskQuery = taskQuery.Where(s => s.Status == status);
 
-            if (query.Priority.HasValue)
-                taskQuery = taskQuery.Where(s => s.Priority == query.Priority);
+            if (priority.HasValue)
+                taskQuery = taskQuery.Where(s => s.Priority == priority);
 
-            if (query.AssigneeId.HasValue)
-                taskQuery = taskQuery.Where(s => s.AssigneeId == query.AssigneeId);
+            if (memberId.HasValue)
+                taskQuery = taskQuery.Where(s => s.MemberId == memberId);
 
-            if (!string.IsNullOrWhiteSpace(query.SearchTerm))
-                taskQuery = taskQuery.Where(t => t.Title.Contains(query.SearchTerm));
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+                taskQuery = taskQuery.Where(t => t.Title.Contains(searchTerm));
 
             return await taskQuery.ToListAsync();
         }
