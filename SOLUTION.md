@@ -16,8 +16,8 @@ Projects
 
 - `Core` (Domain & Application)
   - Domain entities: `TaskItem`, `TeamMember`, `BaseEntity` and related enums (`TaskStatus`, `TaskPriority`).
-  - DTOs / models: `TaskDto`, `TeamMemberDto`, `TaskQuery`.
-  - Interfaces: repository and service abstractions (e.g. `ITaskRepository`, `ITaskService`) — these are dependencies for the service layer and decouple business rules from persistence.
+  - DTOs / models: `CreateTaskRequest`, `UpdateTaskRequest`, `TaskResponse`, `TaskQuery`, `TeamMemberRequest`, `TeamMemberResponse`.
+  - Interfaces: repository and service abstractions (e.g. `ITaskRepository`, `ITeamMemberRepository`, `ITaskService`, `ITeamMemberService`) — these are dependencies for the service layer and decouple business rules from persistence.
   - Services: `TaskService`, `TeamMemberService` implement application use-cases and return a `Result<T>` wrapper for standardized success/error handling.
   - AutoMapper profile centralizes DTO ↔ entity mapping.
 
@@ -49,13 +49,6 @@ Running the solution
 - Run API: `dotnet run --project API`.
 - API docs (local): once running, use the Scalar API Reference at `https://localhost:7033/scalar/v1` to explore endpoints.
 - Tests: `dotnet test` from solution root.
-
-Extension and maintenance notes
-
-- Replace persistence: swap the InMemory provider for SQL Server/Postgres by updating `Program.cs` and adding the appropriate EF provider package(s).
-- Add validation: integrate FluentValidation or similar in the API layer to centralize request validation.
-- Add integration tests: use `WebApplicationFactory<TEntryPoint>` to test controllers and middleware with a test database.
-- Add authentication/authorization: wire authentication in `Program.cs` and secure endpoints with policies/attributes.
 
 Important files to review
 

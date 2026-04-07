@@ -41,10 +41,20 @@ namespace Core.Services
 
         public async Task<Result<TaskResponse>> CreateTaskAsync(CreateTaskRequest request)
         {
+            logger.LogInformation("Creating new task with title: {Title}", request.Title);
+
             if (string.IsNullOrWhiteSpace(request.Title))
                 return Result<TaskResponse>.Failure("Title is required");
 
-            logger.LogInformation("Creating new task with title: {Title}", request.Title);
+            if (request.MemberId.HasValue)
+            {
+                var member = await memberRepository.GetByIdAsync(request.MemberId.Value);
+                if (member is null)
+                {
+                    logger.LogWarning("Team member {MemberId} not found", request.MemberId.Value);
+                    return Result<TaskResponse>.Failure("Team member not found");
+                }
+            }
 
             var task = mapper.Map<TaskItem>(request);
             task.Id = Guid.NewGuid();
